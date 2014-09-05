@@ -193,7 +193,7 @@ localIndentation' localState f_lo f_hi f_hi' m = localState pre post m
 {-# INLINE localIndentation #-}
 -- NOTE: it is the responsibility of 'localState' to *not* use it's arguments if we are in absMode
 localIndentation :: LocalState a -> IndentationRel -> a -> a
-localIndentation localState Eq m = m
+localIndentation _localState Eq m = m
 localIndentation localState Any m = localIndentation' localState (const 0) (const infIndentation) (const) m
 localIndentation localState (Const c) m
     | c == infIndentation = error "localIndentation: Const indentation 'infIndentation' is out of bounds"

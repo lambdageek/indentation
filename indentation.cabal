@@ -19,14 +19,26 @@ source-repository head
 
 library
   exposed-modules:     Text.Parser.Indentation.Implementation
-                     , Text.Parsec.Indentation
+  build-depends:       base >=4.6 && <4.8,
+                       mtl >=2.1 && <2.2
+
+  if flag(Parsec)
+    build-depends:     parsec ==3.1.*
+    exposed-modules:   Text.Parsec.Indentation
                      , Text.Parsec.Indentation.Char
                      , Text.Parsec.Indentation.Token
 
-  build-depends:       base >=4.6 && <4.7,
-                       parsec >=3.1 && <3.2,
-                       mtl >=2.1 && <2.2
+  if flag(Trifecta)
+    build-depends:     trifecta ==1.4.*,
+                       parsers ==0.11.0.*
+    exposed-modules:   Text.Trifecta.Indentation
 
   default-language:    Haskell2010
 
   ghc-options:         -Wall
+
+flag Parsec
+  description:       Include indentation operators for Parsec
+
+flag Trifecta
+  description:       Include indentation operators for Trifecta
