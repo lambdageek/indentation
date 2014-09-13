@@ -162,12 +162,18 @@ localTokenMode localState f_rel = localState pre post where
 absoluteIndentation :: LocalState a -> a -> a
 absoluteIndentation localState = localState pre post where
   pre  i1    = i1 { absMode = True }
-  post i1 i2 = i2 { absMode = absMode i1 } -- redundant if we assertNonAbsMode
+  post i1 i2 = i2 { absMode = absMode i1 && absMode i2 }
 
 {-# INLINE ignoreAbsoluteIndentation #-}
 ignoreAbsoluteIndentation :: LocalState a -> a -> a
 ignoreAbsoluteIndentation localState = localState pre post where
   pre  i1    = i1 { absMode = False }
+  post i1 i2 = i2 { absMode = absMode i1 }
+
+{-# INLINE localAbsoluteIndentation #-}
+localAbsoluteIndentation :: LocalState a -> a -> a
+localAbsoluteIndentation localState = localState pre post where
+  pre  i1    = i1 { absMode = True }
   post i1 i2 = i2 { absMode = absMode i1 }
 
 --{-# INLINE askTokenMode #-}

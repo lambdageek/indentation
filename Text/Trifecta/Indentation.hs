@@ -11,7 +11,8 @@ module Text.Trifecta.Indentation (
   ) where
 
 import Control.Applicative
-import Control.Monad.State
+import Control.Monad.State.Lazy as LazyState
+import Control.Monad.State.Strict as StrictState
 
 import Text.Parser.Combinators
 import Text.Parser.Token
@@ -20,7 +21,8 @@ import Text.Parser.LookAhead
 import Text.Trifecta.Combinators
 import Text.Trifecta.Delta
 
-import Text.Parser.Indentation.Implementation as I
+import Text.Parser.Indentation.Implementation (IndentationState(..), IndentationRel(..), LocalState)
+import qualified Text.Parser.Indentation.Implementation as I
 
 --------------
 -- User API --
@@ -31,12 +33,57 @@ class IndentationParsing m where
   localIndentation :: IndentationRel -> m a -> m a
   absoluteIndentation :: m a -> m a
   ignoreAbsoluteIndentation :: m a -> m a
+  localAbsoluteIndentation :: m a -> m a
+  localAbsoluteIndentation = ignoreAbsoluteIndentation . absoluteIndentation
+
+----------------------
+-- Lifted Instances --
+----------------------
+
+{- TODO:
+Applicative
+Functor
+MonadWriter w m
+MonadError e m
+Monad m
+MonadReader r m
+MonadTrans (StateT s)	 
+Monad m
+Monad m
+MonadFix m
+MonadPlus m
+MonadIO m
+MonadCont m
+#-}
+
+{-# INLINE liftLazyStateT2 #-}
+liftLazyStateT2 :: (m (a, s) -> m (a, s)) -> LazyState.StateT s m a -> LazyState.StateT s m a
+liftLazyStateT2 f m = LazyState.StateT $ \s -> f (LazyState.runStateT m s)
+
+instance (IndentationParsing i) => IndentationParsing (LazyState.StateT s i) where
+  localTokenMode f = liftLazyStateT2 (localTokenMode f)
+  localIndentation r = liftLazyStateT2 (localIndentation r)
+  absoluteIndentation = liftLazyStateT2 absoluteIndentation
+  ignoreAbsoluteIndentation = liftLazyStateT2 ignoreAbsoluteIndentation
+  localAbsoluteIndentation = liftLazyStateT2 localAbsoluteIndentation
+
+{-# INLINE liftStrictStateT2 #-}
+liftStrictStateT2 :: (m (a, s) -> m (a, s)) -> StrictState.StateT s m a -> StrictState.StateT s m a
+liftStrictStateT2 f m = StrictState.StateT $ \s -> f (StrictState.runStateT m s)
+
+instance (IndentationParsing i) => IndentationParsing (StrictState.StateT s i) where
+  localTokenMode f = liftStrictStateT2 (localTokenMode f)
+  localIndentation r = liftStrictStateT2 (localIndentation r)
+  absoluteIndentation = liftStrictStateT2 absoluteIndentation
+  ignoreAbsoluteIndentation = liftStrictStateT2 ignoreAbsoluteIndentation
+  localAbsoluteIndentation = liftStrictStateT2 localAbsoluteIndentation
 
 ---------------
 -- Data Type --
 ---------------
 
-newtype IndentationParserT t m a = IndentationParserT { unIndentationParserT :: StateT IndentationState m a }
+-- TODO: do we need a strict version of this?
+newtype IndentationParserT t m a = IndentationParserT { unIndentationParserT :: LazyState.StateT IndentationState m a }
   deriving (Functor, Applicative, Monad, MonadTrans, MonadPlus, Alternative)
 
 deriving instance (Parsing m, MonadPlus m) => Parsing (IndentationParserT t m)
@@ -47,15 +94,15 @@ deriving instance (MarkParsing Delta m) => MarkParsing Delta (IndentationParserT
 
 {-# INLINE runIndentationParserT #-}
 runIndentationParserT :: IndentationParserT t m a -> IndentationState -> m (a, IndentationState)
-runIndentationParserT (IndentationParserT m) = runStateT m
+runIndentationParserT (IndentationParserT m) = LazyState.runStateT m
 
 {-# INLINE evalIndentationParserT #-}
 evalIndentationParserT :: (Monad m) => IndentationParserT t m a -> IndentationState -> m a
-evalIndentationParserT (IndentationParserT m) = evalStateT m
+evalIndentationParserT (IndentationParserT m) = LazyState.evalStateT m
 
 {-# INLINE execIndentationParserT #-}
 execIndentationParserT :: (Monad m) => IndentationParserT t m a -> IndentationState -> m IndentationState
-execIndentationParserT (IndentationParserT m) = execStateT m
+execIndentationParserT (IndentationParserT m) = LazyState.execStateT m
 
 ---------------------
 -- Class Instances --
@@ -94,14 +141,17 @@ instance (Monad m) => IndentationParsing (IndentationParserT t m) where
   {-# INLINE localTokenMode #-}
   localTokenMode = I.localTokenMode localState
 
+  {-# INLINE localIndentation #-}
+  localIndentation = I.localIndentation localStateUnlessAbsMode
+
   {-# INLINE absoluteIndentation #-}
   absoluteIndentation = I.absoluteIndentation localState
 
   {-# INLINE ignoreAbsoluteIndentation #-}
   ignoreAbsoluteIndentation = I.ignoreAbsoluteIndentation localState
 
-  {-# INLINE localIndentation #-}
-  localIndentation = I.localIndentation localStateUnlessAbsMode
+  {-# INLINE localAbsoluteIndentation #-}
+  localAbsoluteIndentation = I.localAbsoluteIndentation localState
 
 ---------------------
 -- Private Helpers --
@@ -120,14 +170,14 @@ localState pre post m = IndentationParserT $ do
 {-# INLINE localStateUnlessAbsMode #-}
 localStateUnlessAbsMode :: (Monad m) => LocalState (IndentationParserT t m a)
 localStateUnlessAbsMode pre post m = IndentationParserT $ do
-  a <- gets indentationStateAbsMode
+  a <- gets I.indentationStateAbsMode
   unIndentationParserT $ if a then m else localState pre post m
 
 {-# INLINE checkIndentation #-}
-checkIndentation :: (DeltaParsing m) => StateT IndentationState m a -> IndentationParserT t m a
+checkIndentation :: (DeltaParsing m) => LazyState.StateT IndentationState m a -> IndentationParserT t m a
 checkIndentation m = IndentationParserT $ do
     is <- get
     p <- position
     let ok is' = do x <- m; put is'; return x
         err msg = fail msg
-    updateIndentation is (fromIntegral $ column p + 1) ok err
+    I.updateIndentation is (fromIntegral $ column p + 1) ok err

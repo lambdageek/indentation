@@ -76,6 +76,10 @@ localStateUnlessAbsMode pre post m = do
 localTokenMode :: (Monad m) => (IndentationRel -> IndentationRel) -> ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m a
 localTokenMode = I.localTokenMode localState
 
+{-# INLINE localIndentation #-}
+localIndentation :: (Monad m) => IndentationRel -> ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m a
+localIndentation = I.localIndentation localStateUnlessAbsMode
+
 {-# INLINE absoluteIndentation #-}
 absoluteIndentation :: (Monad m) => ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m a
 absoluteIndentation = I.absoluteIndentation localState
@@ -85,9 +89,9 @@ absoluteIndentation = I.absoluteIndentation localState
 ignoreAbsoluteIndentation :: (Monad m) => ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m a
 ignoreAbsoluteIndentation = I.ignoreAbsoluteIndentation localState
 
-{-# INLINE localIndentation #-}
-localIndentation :: (Monad m) => IndentationRel -> ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m a
-localIndentation = I.localIndentation localStateUnlessAbsMode
+{-# INLINE localAbsoluteIndentation #-}
+localAbsoluteIndentation :: (Monad m) => ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m a
+localAbsoluteIndentation = I.localAbsoluteIndentation localState
 
 ------------------------
 -- Indent Stream Impls

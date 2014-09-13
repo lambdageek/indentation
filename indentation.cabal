@@ -1,5 +1,5 @@
 name:                indentation
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Indentation sensitive parsing combinators for Parsec
 -- description:
 license:             BSD3
@@ -39,6 +39,8 @@ library
 
 flag Parsec
   description:       Include indentation operators for Parsec
+  manual:            True
 
 flag Trifecta
   description:       Include indentation operators for Trifecta
+  manual:            True
