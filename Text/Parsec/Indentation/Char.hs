@@ -1,7 +1,11 @@
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, FlexibleContexts #-}
 module Text.Parsec.Indentation.Char where
 
-import Text.Parsec
+import Text.Parsec.Prim (ParsecT, mkPT, runParsecT,
+                         Stream(..),
+                         Consumed(..), Reply(..),
+                         State(..))
+import Text.Parsec.Pos (sourceColumn)
 import Text.Parser.Indentation.Implementation (Indentation)
 
 ----------------

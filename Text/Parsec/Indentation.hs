@@ -17,7 +17,9 @@ module Text.Parsec.Indentation (module Text.Parsec.Indentation, I.IndentationRel
 
 import Control.Monad
 --import Text.Parsec.Prim
-import Text.Parsec
+import Text.Parsec.Prim (ParsecT, mkPT, runParsecT,
+                         Stream(..), Consumed(..), Reply(..),
+                         State(..), getInput, setInput)
 import Text.Parsec.Error (Message (Message), addErrorMessage)
 import Text.Parser.Indentation.Implementation as I
 
