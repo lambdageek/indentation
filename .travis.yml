@@ -1,0 +1,11 @@
+language: haskell
+ghc:
+  - 7.6
+  - 7.8
+env:
+  - USE_TRIFECTA='<1.5'
+  - USE_TRIFECTA='>=1.5'
+install:
+  - cabal install --only-dependencies --constraint "trifecta $USE_TRIFECTA"
+script:
+  - cabal configure && cabal build
