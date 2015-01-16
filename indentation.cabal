@@ -1,5 +1,5 @@
 name:                indentation
-version:             0.2.0.1
+version:             0.2.0.2
 synopsis:            Indentation sensitive parsing combinators for Parsec
 -- description:
 license:             BSD3
@@ -23,14 +23,14 @@ library
                        mtl >=2.1 && <2.2
 
   if flag(Parsec)
-    build-depends:     parsec ==3.1.*
+    build-depends:     parsec >=3.1.5
     exposed-modules:   Text.Parsec.Indentation
                      , Text.Parsec.Indentation.Char
                      , Text.Parsec.Indentation.Token
 
   if flag(Trifecta)
-    build-depends:     trifecta ==1.4.*,
-                       parsers ==0.11.0.*
+    build-depends:     trifecta >=1.4 && <1.6,
+                       parsers >=0.10 && <0.13
     exposed-modules:   Text.Trifecta.Indentation
 
   default-language:    Haskell2010
