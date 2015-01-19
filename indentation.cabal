@@ -6,6 +6,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Michael D. Adams <http://michaeldadams.org/>
 maintainer:          Ömer Sinan Ağacan <omeragacan@gmail.com>
+                     Aleksey Kliger <aleksey@lambdageek.org>
 category:            Parsing
 build-type:          Simple
 cabal-version:       >=1.10
@@ -20,7 +21,7 @@ source-repository head
 library
   exposed-modules:     Text.Parser.Indentation.Implementation
   build-depends:       base >=4.6 && <4.8,
-                       mtl >=2.1 && <2.2
+                       mtl >=2.1
 
   if flag(Parsec)
     build-depends:     parsec >=3.1.5
