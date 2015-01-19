@@ -14,12 +14,12 @@ import Control.Applicative
 import Control.Monad.State.Lazy as LazyState
 import Control.Monad.State.Strict as StrictState
 
-import Text.Parser.Combinators
-import Text.Parser.Token
-import Text.Parser.Char
-import Text.Parser.LookAhead
-import Text.Trifecta.Combinators
-import Text.Trifecta.Delta
+import Text.Parser.Combinators (Parsing(..))
+import Text.Parser.Token (TokenParsing(..))
+import Text.Parser.Char (CharParsing(..))
+import Text.Parser.LookAhead (LookAheadParsing(..))
+import Text.Trifecta.Combinators (DeltaParsing(..), MarkParsing(..))
+import Text.Trifecta.Delta (Delta, column)
 
 import Text.Parser.Indentation.Implementation (IndentationState(..), IndentationRel(..), LocalState)
 import qualified Text.Parser.Indentation.Implementation as I
