@@ -6,6 +6,6 @@ env:
   - USE_TRIFECTA='<1.5'
   - USE_TRIFECTA='>=1.5'
 install:
-  - cabal install --enable-tests --only-dependencies --constraint "trifecta $USE_TRIFECTA"
+  - cabal install --enable-tests --only-dependencies --constraint "trifecta $USE_TRIFECTA" --constraint 'blaze-markup <= 0.6.2.0'
 script:
   - cabal configure --enable-tests && cabal build && cabal test
