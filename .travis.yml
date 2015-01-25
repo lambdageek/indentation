@@ -6,6 +6,6 @@ env:
   - USE_TRIFECTA='<1.5'
   - USE_TRIFECTA='>=1.5'
 install:
-  - cabal install --only-dependencies --constraint "trifecta $USE_TRIFECTA"
+  - cabal install --enable-tests --only-dependencies --constraint "trifecta $USE_TRIFECTA"
 script:
-  - cabal configure && cabal build
+  - cabal configure --enable-tests && cabal build && cabal test
