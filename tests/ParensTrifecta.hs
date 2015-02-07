@@ -34,12 +34,20 @@ a' = choice
     ]
 
 
-runParse input
- = let indA = evalIndentationParserT (a :: IndentationParserT Char Parser A)
-              $ mkIndentationState 0 infIndentation True Gt
+evalCharIndentationParserT :: Monad m => IndentationParserT Char m a -> IndentationState -> m a
+evalCharIndentationParserT = evalIndentationParserT
+
+evalTokenIndentationParserT :: Monad m => IndentationParserT Token m a -> IndentationState -> m a
+evalTokenIndentationParserT = evalIndentationParserT
+
+runParse ev input
+ = let indA = ev a $ mkIndentationState 0 infIndentation True Gt
    in case parseString indA mempty input of
     Failure err -> Left (show err)
     Success a -> Right a
+
+runCharParse = runParse evalCharIndentationParserT
+runTokenParse = runParse evalTokenIndentationParserT
 
 -- conveniences for tests
 parL = Par . listToSeq
@@ -54,7 +62,8 @@ input1 = unlines [ "("
                  , "      ]"
                  , ")"
                  ]
-output1 = runParse input1
+output1c = runCharParse input1
+output1t = runTokenParse input1
 expected1 = listToSeq [ parL [braL [parL []]]
                       ]
 
@@ -65,10 +74,11 @@ input2 = unlines [ "("
                  , "        []"
                  , "    ]"
                  , "   ("
-                 , "   )"
+                 , "  )"
                  , ")"
                  ]
-output2 = runParse input2
+output2c = runCharParse input2
+output2t = runTokenParse input2
 expected2 = listToSeq [ parL [ braL [ parL []
                                     , braL []
                                     ]
@@ -82,11 +92,18 @@ assertParsedOk actual expected =
   case actual of
    Right ok -> assertEqual "parsing succeeded, but " expected ok
    Left err -> assertFailure ("parse failed with " ++ show err
-                              ++ ", expected" ++ show expected)
+                              ++ ", expected " ++ show expected)
 
 allTests :: TestTree
 allTests =
   testGroup "parens (trifecta)"
-  [ testCase "1" $ assertParsedOk output1 expected1
-  , testCase "2" $ assertParsedOk output2 expected2
+  [
+    testGroup "char parsing"
+    [ testCase "1" $ assertParsedOk output1c expected1
+    , testCase "2" $ assertParsedOk output2c expected2
+    ]
+  , testGroup "token parsing"
+    [ testCase "1" $ assertParsedOk output1t expected1
+    , testCase "2" $ assertParsedOk output2t expected2
+    ]
   ]
