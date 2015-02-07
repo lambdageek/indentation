@@ -74,7 +74,7 @@ input2 = unlines [ "("
                  , "        []"
                  , "    ]"
                  , "   ("
-                 , "  )"
+                 , "   )"
                  , ")"
                  ]
 output2c = runCharParse input2
