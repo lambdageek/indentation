@@ -3,7 +3,9 @@
 -- Implements "Indentation Senstivie Parsing" for Trifecta
 module Text.Trifecta.Indentation (
   I.IndentationRel(..), I.Indentation, I.infIndentation, I.mkIndentationState,
+  I.IndentationState,
   IndentationParsing(..),
+  Token,
   IndentationParserT,
   runIndentationParserT,
   evalIndentationParserT,
