@@ -32,7 +32,7 @@ source-repository head
 
 library
   exposed-modules:     Text.Parser.Indentation.Implementation
-  build-depends:       base >=4.6 && <4.8,
+  build-depends:       base >=4.6 && <4.9,
                        mtl >=2.1
 
   if flag(Parsec)
