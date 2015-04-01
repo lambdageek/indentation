@@ -1,5 +1,5 @@
 name:                indentation
-version:             0.2.1
+version:             0.2.1.1
 synopsis:            Indentation sensitive parsing combinators for Parsec and Trifecta
 description:         Indentation sensitive parsing combinators for Parsec and Trifecta.
                      .                     
