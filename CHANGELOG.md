@@ -1,3 +1,7 @@
+# 0.2.1.2 #
+
+* Support GHC 8.0.1 (release candidate 2)
+
 # 0.2.1.1 #
 
 * Bump base dep to allow 4.8.*
