@@ -35,7 +35,7 @@ type IndentationToken t = t
 mkIndentStream :: Indentation -> Indentation -> Bool -> IndentationRel -> s -> IndentStream s
 mkIndentStream lo hi mode rel s = IndentStream (mkIndentationState lo hi mode rel) s
 
-instance (Stream s m (t, Indentation)) => Stream (IndentStream s) m (IndentationToken t) where
+instance (Monad m, Stream s m (t, Indentation)) => Stream (IndentStream s) m (IndentationToken t) where
   uncons (IndentStream is s) = do
     x <- uncons s
     case x of

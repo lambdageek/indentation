@@ -25,6 +25,7 @@ extra-source-files:  CHANGELOG.md
 
 homepage:            https://bitbucket.org/mdmkolbe/indentation
 bug-reports:         https://bitbucket.org/mdmkolbe/indentation/issues
+tested-with:         GHC == 7.6.3, GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1
 
 source-repository head
   type:                git
@@ -32,7 +33,7 @@ source-repository head
 
 library
   exposed-modules:     Text.Parser.Indentation.Implementation
-  build-depends:       base >=4.6 && <4.9,
+  build-depends:       base >=4.6 && <4.10,
                        mtl >=2.1
 
   if flag(Parsec)
