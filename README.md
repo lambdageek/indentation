@@ -4,7 +4,7 @@ This repository contains Haskell libraries for indentation-sensitive parsing wit
 
 The packages are available on hackage:
 * [`indentation-parsec`](https://hackage.haskell.org/packages/indentation-parsec) for [Parsec](https://hackage.haskell.org/packages/parsec)
-* [`indentation-trifecta`](https://hackage.haskell.org/packages/indentation-parsec) for [Trifecta](https://hackage.haskell.org/packages/trifecta)
+* [`indentation-trifecta`](https://hackage.haskell.org/packages/indentation-trifecta) for [Trifecta](https://hackage.haskell.org/packages/trifecta)
 
 Two other packages are provided:
 * `indentation-core` contains the shared core implementation of
