@@ -29,13 +29,13 @@ build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  CHANGELOG.md
 
-homepage:            https://bitbucket.org/mdmkolbe/indentation
-bug-reports:         https://bitbucket.org/mdmkolbe/indentation/issues
+homepage:            https://bitbucket.org/adamsmd/indentation
+bug-reports:         https://bitbucket.org/adamsmd/indentation/issues
 tested-with:         GHC == 7.6.3, GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1
 
 source-repository head
   type:                git
-  location:            https://bitbucket.org/mdmkolbe/indentation.git
+  location:            https://bitbucket.org/adamsmd/indentation.git
 
 library
   hs-source-dirs:      src
