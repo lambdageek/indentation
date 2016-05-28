@@ -1,3 +1,7 @@
+# 0.3.0.1 #
+
+* Hyperlink Haddock of re-exported modules to the other packages.
+
 # 0.3 #
 
 * Broke package up into `indentation-core`, `indentation-parsec` and `indentation-trifecta` packages.
