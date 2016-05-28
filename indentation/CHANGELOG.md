@@ -1,3 +1,8 @@
+# 0.3 #
+
+* Broke package up into `indentation-core`, `indentation-parsec` and `indentation-trifecta` packages.
+  This package is now solely for backward compatability.
+  
 # 0.2.1.2 #
 
 * Support GHC 8.0.1 (release candidate 2)
