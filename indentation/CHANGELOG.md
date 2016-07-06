@@ -1,3 +1,8 @@
+# 0.3.1 #
+
+* Bump `indentation-trifecta` dependency to `0.0.1` (supports `trifecta-1.6`)
+
+
 # 0.3.0.1 #
 
 * Hyperlink Haddock of re-exported modules to the other packages.

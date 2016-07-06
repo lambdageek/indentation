@@ -1,3 +1,7 @@
+# 0.0.1
+
+* Support `trifecta-1.6`
+
 # 0.0
 
 * Split `indentation` into separate `indentation-core`, `indentation-parsec` and `indentation-trifecta` packages.

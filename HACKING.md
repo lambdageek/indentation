@@ -16,7 +16,7 @@ of the git repository:
 
 ```bash
 $ cabal sandbox init
-$ for d in indentation-core indentation-parsec indentation-trifecta indentation; do cabal add-source $d ; done
+$ for d in indentation-core indentation-parsec indentation-trifecta indentation; do cabal sandbox add-source $d ; done
 $ for d in indentation-core indentation-parsec indentation-trifecta indentation; do pushd $d ; cabal sandbox init --sandbox ../.cabal-sandbox ; popd ; done
 ```
 
