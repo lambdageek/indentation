@@ -1,6 +1,30 @@
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses, FlexibleContexts, UndecidableInstances, TupleSections #-}
 {-# OPTIONS -Wall  #-}
-module Text.Parsec.Indentation (module Text.Parsec.Indentation, I.IndentationRel(..), Indentation, infIndentation) where
+-- | Indentation sensitive parsing for Parsec
+module Text.Parsec.Indentation (
+  -- $intro
+  
+  -- * Indentation Streams
+  IndentStream
+  , IndentationToken
+  , mkIndentStream
+  -- * Indentation Relation and Columns
+  , I.IndentationRel(..)
+    -- | We use indent 1 for the first column.  Not only is this consistent
+    -- with how Parsec counts columns, but it also allows 'Gt' to refer to
+    -- the first column by setting the indent to 0.
+  , Indentation
+    -- | Infinite indentation.
+  , infIndentation
+  -- * Indentation Combinators
+  , localTokenMode
+  , localIndentation
+  , absoluteIndentation
+  , ignoreAbsoluteIndentation
+  , localAbsoluteIndentation
+  -- * Parsec Parsers
+  , indentStreamParser
+      ) where
 
 -- Implements "Indentation Senstivie Parising: Landin Revisited"
 --
@@ -21,7 +45,13 @@ import Text.Parsec.Prim (ParsecT, mkPT, runParsecT,
                          Stream(..), Consumed(..), Reply(..),
                          State(..), getInput, setInput)
 import Text.Parsec.Error (Message (Message), addErrorMessage)
-import Text.Parser.Indentation.Implementation as I
+import Text.Parser.Indentation.Implementation (Indentation, IndentationRel (..), infIndentation, LocalState(..), IndentationState (..), updateIndentation, indentationStateAbsMode, mkIndentationState)
+import qualified Text.Parser.Indentation.Implementation as I
+
+-- $setup
+-- >>> :set -XFlexibleContexts
+-- >>> import qualified Text.Parsec.Indentation.Char as C
+-- >>> import Text.Parsec (Parsec, try)
 
 ------------------------
 -- Indentable Stream
@@ -31,6 +61,15 @@ data IndentStream s = IndentStream { indentationState :: !IndentationState, toke
 --data IndentationToken t = IndentationToken !t | InvalidIndentation String
 type IndentationToken t = t
 
+-- | @mkIndentStream lo hi isAbsMode rel s@ makes a new indentation
+-- stream with the given minimum and maximum indentation levels,
+-- starting in absolute mode if @isAbsMode@ is @True@ or relative mode
+-- otherwise, with token relation @rel@.
+-- 
+-- >>> mkIndentStream 0 infIndentation True Gt "abcd"
+-- IndentStream {indentationState = IndentationState {minIndentation = 0, maxIndentation = ..., absMode = True, tokenRel = Gt}, tokenStream = "abcd"}
+--
+-- Note that columns count from 1 so 0 and @Gt@ indicate that tokens should be in any column. 
 {-# INLINE mkIndentStream #-}
 mkIndentStream :: Indentation -> Indentation -> Bool -> IndentationRel -> s -> IndentStream s
 mkIndentStream lo hi mode rel s = IndentStream (mkIndentationState lo hi mode rel) s
@@ -207,3 +246,97 @@ test2 = foo where
   foo = 3
   bar = 4
 -}
+
+-- $intro
+-- 
+-- An indentation-sensitive language can be thought of as annotating
+-- each token in the input stream by a column number (represented as
+-- an 'Indentation').  With column numbers, new combinators are
+-- available to allow a parser to consume a token only if its
+-- indentation agrees with a certain predicate such as /indented more
+-- than the last successfully parsed token/ or /aligned in the same
+-- column as the last successfully parsed token/.
+--
+-- Consider the following self-contained example:
+--
+-- >>> data T a = Node a [T a] deriving (Show)
+-- >>> :{
+-- let input = unlines [
+--       "a",
+--       "  b",
+--       "  c",
+--       "d",
+--       "e",
+--       "  f",
+--       "  g"
+--       ]
+-- :}
+--
+-- >>> input
+-- "a\n  b\n  c\n..."
+--
+-- >>> mkStream = mkIndentStream 0 infIndentation True Gt . C.mkCharIndentStream
+-- >>> :t mkStream
+-- mkStream :: s -> IndentStream (C.CharIndentStream s)
+--
+-- >>> import Control.Applicative
+-- >>> import qualified Text.Parsec.Char as PC
+-- >>> import Text.Parsec.Combinator
+-- >>> upgradeParser = indentStreamParser . C.charIndentStreamParser
+-- >>> whiteSpace = ignoreAbsoluteIndentation (localTokenMode (const Any) (upgradeParser PC.spaces))
+-- >>> lexeme p = p <* whiteSpace
+-- >>> letter = lexeme (upgradeParser PC.letter)
+--
+-- >>> :t letter
+-- ...
+--
+-- >>> verticallyAlignedList p = localIndentation Gt (many (absoluteIndentation p))
+-- >>> :t verticallyAlignedList
+-- verticallyAlignedList
+--   :: Monad m =>
+--      ParsecT (IndentStream s) u m a -> ParsecT (IndentStream s) u m [a] 
+--
+-- >>> :{
+-- oneTree :: Stream s m Char => ParsecT (IndentStream (C.CharIndentStream s)) u m a -> ParsecT (IndentStream (C.CharIndentStream s)) u m (T a)
+-- oneTree thing = Node <$> try thing <*> (verticallyAlignedList (oneTree thing))
+-- :}
+--
+-- >>> :{
+-- parse :: Parsec (IndentStream (C.CharIndentStream String)) () a -> String -> Either Text.Parsec.Error.ParseError a
+-- parse p s = Text.Parsec.Prim.parse (whiteSpace *> p <* localTokenMode (const Any) eof) "" (mkStream s)
+-- :}
+-- 
+-- >>> parse letter "a"
+-- Right 'a'
+--
+-- >>> parse letter " "
+-- Left ...
+-- ...
+--
+-- >>> parse (verticallyAlignedList letter) "a\nb\n"
+-- Right "ab"
+--
+-- >>> parse (verticallyAlignedList letter) "  a\n  b\n"
+-- Right "ab"
+--
+-- >>> parse (verticallyAlignedList letter) "  a\nb"
+-- Left (line 2, column 2):
+-- Invalid indentation.  Found a token at indentation 1.  Expecting a token at an indentation between 3 and 3...
+--
+-- >>> parse (oneTree letter) ""
+-- Left ...
+-- ...
+--
+-- >>> parse (oneTree letter) "a"
+-- Right (Node 'a' [])
+--
+-- >>> parse (oneTree letter) "a\n b\n c\n"
+-- Right (Node 'a' [Node 'b' [],Node 'c' []])
+-- 
+-- >>> parse (verticallyAlignedList (oneTree letter)) input
+-- Right ...
+--
+-- See "Test.Parsec.Indentation.Char" for 'Test.Parsec.Indentation.Char.mkCharIndentStream'.
+--
+-- See "Text.Parsec.Indentation.Token" for token combinators built atop 'IndentStream' .
+  

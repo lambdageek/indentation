@@ -17,13 +17,27 @@ module Text.Parser.Indentation.Implementation where
 -- Indentations
 ------------------------
 
--- We use indent 1 for the first column.  Not only is this consistent
+-- | We use indent 1 for the first column.  Not only is this consistent
 -- with how Parsec counts columns, but it also allows 'Gt' to refer to
 -- the first column by setting the indent to 0.
---data Indentation = Indentation# Int# deriving (Eq, Ord)
 type Indentation = Int
-data IndentationRel = Eq | Any | Const Indentation | Ge | Gt deriving (Show, Eq)
 
+--data Indentation = Indentation# Int# deriving (Eq, Ord)
+
+-- | Relative indentation.
+data IndentationRel =
+  -- | Indicates tokens should be in the same column as the current token.
+  Eq
+  -- | Indicates that tokens can be in any column.
+  | Any
+  -- | Indicates that tokens should be in the given column.
+  | Const Indentation
+  -- | Indicates that tokens should be in the same or more indented column as the current token.
+  | Ge
+  -- | Indicates that tokens should be more indented than the current token.
+  | Gt deriving (Show, Eq)
+
+-- | Infinite indentation.
 {-# INLINE infIndentation #-}
 infIndentation :: Indentation
 infIndentation = maxBound
