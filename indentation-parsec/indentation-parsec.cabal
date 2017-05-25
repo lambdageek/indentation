@@ -39,7 +39,7 @@ source-repository head
 
 library
   hs-source-dirs:      src
-  build-depends:       base >=4.6 && <4.10,
+  build-depends:       base >=4.6 && <4.12,
                        mtl >=2.1,
                        indentation-core == 0.0,
                        parsec >=3.1.5
