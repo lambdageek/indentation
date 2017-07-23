@@ -1,3 +1,8 @@
+# 0.3.2 #
+
+* Bump `indentation-trifecta` dependency to `0.0.2` (supports `trifecta-1.7`)
+* Bump `base` bounds to support GHC 8.2.1
+
 # 0.3.1 #
 
 * Bump `indentation-trifecta` dependency to `0.0.1` (supports `trifecta-1.6`)

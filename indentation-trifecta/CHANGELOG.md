@@ -1,3 +1,8 @@
+# 0.0.2
+
+* Support 'trifecta-1.7'
+* Bump `base` bounds to support GHC 8.2.1
+
 # 0.0.1
 
 * Support `trifecta-1.6`
