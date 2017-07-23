@@ -52,7 +52,7 @@ library
                      , Text.Parsec.Indentation.Token
 
   if flag(Trifecta)
-    build-depends:     trifecta >=1.4 && <1.7,
+    build-depends:     trifecta >=1.4 && <1.8,
                        parsers >=0.10 && <0.13,
                        indentation-trifecta == 0.0.1
     exposed-modules:   Text.Trifecta.Indentation

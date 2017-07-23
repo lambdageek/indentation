@@ -40,7 +40,7 @@ library
   build-depends:       base >=4.6 && <4.12,
                        mtl >=2.1,
                        indentation-core == 0.0,
-                       trifecta >=1.4 && <1.7,
+                       trifecta >=1.4 && <1.8,
                        parsers >=0.10 && <0.13
   exposed-modules:   Text.Trifecta.Indentation
 
