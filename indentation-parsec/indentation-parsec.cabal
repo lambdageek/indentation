@@ -1,5 +1,5 @@
 name:                indentation-parsec
-version:             0.0
+version:             0.0.0.1
 synopsis:            Indentation sensitive parsing combinators for Parsec
 description:         Indentation sensitive parsing combinators for Parsec
                      .                     
@@ -41,7 +41,7 @@ library
   hs-source-dirs:      src
   build-depends:       base >=4.6 && <4.12,
                        mtl >=2.1,
-                       indentation-core == 0.0,
+                       indentation-core == 0.0.0.1,
                        parsec >=3.1.5
   exposed-modules:     Text.Parsec.Indentation
                      , Text.Parsec.Indentation.Char
