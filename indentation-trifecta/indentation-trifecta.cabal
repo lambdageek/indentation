@@ -1,5 +1,5 @@
 name:                indentation-trifecta
-version:             0.0.2
+version:             0.1.0
 synopsis:            Indentation sensitive parsing combinators for Trifecta
 description:         Indentation sensitive parsing combinators for Trifecta.
                      .                     
@@ -37,10 +37,10 @@ source-repository head
 
 library
   hs-source-dirs:      src
-  build-depends:       base >=4.6 && <4.12,
+  build-depends:       base >=4.6 && <4.13,
                        mtl >=2.1,
-                       indentation-core == 0.0.0.1,
-                       trifecta >=1.4 && <1.8,
+                       indentation-core < 0.0.1,
+                       trifecta < 2 || == 2,
                        parsers >=0.10 && <0.13
   exposed-modules:   Text.Trifecta.Indentation
 
